@@ -1,5 +1,6 @@
 package com.TaskManagement.TaskManagement.Models;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,7 +42,7 @@ public class Task {
     private AppUser assignedTo;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    private List<TaskHistory> history;
+    private List<TaskHistory> history = new ArrayList<>();
 
     public UUID getId() {
         return id;
