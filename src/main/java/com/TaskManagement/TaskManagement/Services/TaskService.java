@@ -38,9 +38,9 @@ public class TaskService {
             task.setCreatedBy(u);
             task.setDescription(taskWriteDTO.description());
             task.setTitle(taskWriteDTO.title());
-    
-            Task savedTask = taskRepository.save(task);
-            return ResponseEntity.ok(savedTask.toString());
+            
+            taskRepository.save(task);
+            return ResponseEntity.ok("Task Created successfully!");
         }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!"));
     }
     
