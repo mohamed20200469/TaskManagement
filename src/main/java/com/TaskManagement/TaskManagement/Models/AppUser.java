@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +27,9 @@ public class AppUser implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+    @Column(nullable = false)
     private String username;
+    @Column(nullable = false)
     private String password;
     
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
