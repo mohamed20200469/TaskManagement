@@ -1,13 +1,15 @@
 package com.TaskManagement.TaskManagement.Controllers;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.TaskManagement.TaskManagement.DTOs.AssignTaskDTO;
 import com.TaskManagement.TaskManagement.DTOs.TaskWriteDTO;
 import com.TaskManagement.TaskManagement.Services.TaskService;
 
@@ -22,7 +24,12 @@ public class TaskController {
     }
 
     @PostMapping("")
-    public ResponseEntity<String> testAuth(@RequestBody TaskWriteDTO taskWriteDTO) {
+    public ResponseEntity<String> createTask(@RequestBody TaskWriteDTO taskWriteDTO) {
         return taskService.createTask(taskWriteDTO);
+    }
+
+    @PutMapping("")
+    public ResponseEntity<String> assignTask(@RequestBody AssignTaskDTO assignTaskDTO) {
+        return taskService.assignTask(assignTaskDTO.username(), assignTaskDTO.taskId());
     }
 }
