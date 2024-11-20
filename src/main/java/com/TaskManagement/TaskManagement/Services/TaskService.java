@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
+import com.TaskManagement.TaskManagement.Constants.State;
 import com.TaskManagement.TaskManagement.DTOs.TaskWriteDTO;
 import com.TaskManagement.TaskManagement.Models.Task;
 import com.TaskManagement.TaskManagement.Repositories.TaskRepository;
@@ -60,5 +61,30 @@ public class TaskService {
             return ResponseEntity.ok("Task Updated successfully!");
         }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!"));
     }
-    
+
+    public ResponseEntity<String> updateTask(State state, UUID taskId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found!");
+        }
+
+        User user = (User) authentication.getPrincipal();
+        var appUser = userRepository.findByUsername(user.getUsername());
+
+        return appUser.map(u -> {
+            var task = taskRepository.findById(taskId);
+            if (task.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task not found!");
+            }
+
+            if (!task.get().getAssignedTo().getId().equals(appUser.get().getId())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("This is not your task!");
+            }
+
+            task.get().setState(state);
+            taskRepository.save(task.get());
+            return ResponseEntity.ok("Task Updated successfully!");
+        }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!"));
+    }
 }
