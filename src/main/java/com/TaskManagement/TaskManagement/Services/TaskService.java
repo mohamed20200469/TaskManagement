@@ -1,5 +1,6 @@
 package com.TaskManagement.TaskManagement.Services;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import com.TaskManagement.TaskManagement.Constants.State;
 import com.TaskManagement.TaskManagement.DTOs.TaskWriteDTO;
 import com.TaskManagement.TaskManagement.Models.Task;
+import com.TaskManagement.TaskManagement.Models.TaskHistory;
+import com.TaskManagement.TaskManagement.Repositories.TaskHistoryRepository;
 import com.TaskManagement.TaskManagement.Repositories.TaskRepository;
 import com.TaskManagement.TaskManagement.Repositories.UserRepository;
 
@@ -19,11 +22,13 @@ import com.TaskManagement.TaskManagement.Repositories.UserRepository;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final TaskHistoryRepository taskHistoryRepository;
     private final UserRepository userRepository;
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, TaskHistoryRepository taskHistoryRepository) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.taskHistoryRepository = taskHistoryRepository;
     }
 
     public ResponseEntity<String> createTask(TaskWriteDTO taskWriteDTO) {
@@ -81,7 +86,16 @@ public class TaskService {
             if (!task.get().getAssignedTo().getId().equals(appUser.get().getId())) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("This is not your task!");
             }
-
+            
+            
+            TaskHistory taskHistory = new TaskHistory();
+            taskHistory.setTask(task.get());
+            taskHistory.setOldState(task.get().getState());
+            taskHistory.setNewState(state);
+            taskHistory.setTimestamp(LocalDateTime.now());
+            taskHistory.setUpdatedBy(u);
+            taskHistoryRepository.save(taskHistory);
+            
             task.get().setState(state);
             taskRepository.save(task.get());
             return ResponseEntity.ok("Task Updated successfully!");
